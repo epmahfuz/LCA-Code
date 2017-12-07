@@ -1,0 +1,81 @@
+#include<bits/stdc++.h>
+#define fi(i, a, b) for(int i=a; i<=b; i++)
+#define fd(i, b, a) for(int i=b; i>=a; i--)
+#define pb push_back
+using namespace std;
+
+vector<int>g[100005];
+int P[100005], L[100005], T[100005][22];
+
+void dfs(int from, int u, int dep){
+    P[u]=from;
+    L[u]=dep;
+    int sz=g[u].size();
+    fi(i, 0, sz-1){
+        int v=g[u][i];
+        if(v==from) continue;
+        dfs(u, v, dep+1);
+    }
+    return ;
+}
+
+void lca(int N){
+    memset(T, -1, sizeof(T));
+    fi(i, 0, N-1){
+        T[i][0]=P[i];
+    }
+    for(int j=0; (1<<j)<N; j++){
+        fi(i, 0, N-1){
+            if(T[i][j-1]!=-1){
+                T[i][j] = T[T[i][j-1]][j-1];
+            }
+        }
+    }
+    return ;
+}
+
+int lca_query(int N, int p, int q){
+    int log=1;
+    if(L[p]<L[q])
+        swap(p, q);
+    while(1){
+        if((1<<log) > L[p]){
+            log--; break;
+        }
+        log++;
+    }
+    fd(i, log, 0){
+        if(L[p]-(1<<i) >= L[q])
+            p=T[p][i];
+    }
+    if(p==q) return p;
+    fd(i, log, 0){
+        if(T[p][i]!=-1 && T[p][i]!=T[q][i])
+            p=T[p][i], q=T[q][i];
+    }
+    return P[p];
+}
+
+int main(){
+    g[0].pb(1);
+    g[1].pb(2);
+    g[1].pb(8);
+    g[2].pb(3);
+    g[3].pb(4);
+    g[4].pb(5);
+    g[5].pb(6);
+    g[6].pb(7);
+    g[6].pb(14);
+    g[8].pb(9);
+    g[9].pb(10);
+    g[10].pb(11);
+    g[11].pb(12);
+    g[12].pb(13);
+    g[11].pb(15);
+    g[12].pb(16);
+
+    dfs(0, 0, 0);
+    lca(17);
+    cout<<lca_query(17, 14, 11)<<endl;
+    return 0;
+}
